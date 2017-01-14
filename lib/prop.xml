@@ -38,7 +38,7 @@
 		<param name="dictionary_element_factory" value="net.didion.jwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory"/>
 		<param name="file_manager" value="net.didion.jwnl.dictionary.file_manager.FileManagerImpl">
 			<param name="file_type" value="net.didion.jwnl.princeton.file.PrincetonRandomAccessDictionaryFile"/>
-			<param name="dictionary_path" value="/home/iiacobac/IMS/ims_0.9.2.1/lib/dict"/>
+			<param name="dictionary_path" value="lib/dic"/>
 		</param>
 	</dictionary>
 	<resource class="PrincetonResource"/>
