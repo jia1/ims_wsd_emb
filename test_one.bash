@@ -1,22 +1,50 @@
 #!/bin/bash
+
 if [ $# -lt 3 ]; then
-  echo "$0 modeldir testfile savedir index.sense(option)"
-  exit
+    echo "Usage:    $0 MODEL_DIR test.xml OUTPUT_DIR index.sense(option)"
+    exit
 fi
-if (set -u; : $WSDHOME) 2> /dev/null
-then
-  bdir=$WSDHOME
-else
-  bdir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-fi
-libdir=$bdir/lib
-CP=$libdir/liblinear-1.33-with-deps.jar:$libdir/jwnl.jar:$libdir/commons-logging.jar:$libdir/jdom.jar:$libdir/trove.jar:$libdir/maxent-2.4.0.jar:$libdir/opennlp-tools-1.3.0.jar:$bdir/ims_embed.jar
-modeldir=$1
-testfile=$2
-savedir=$3
+
+IMS_DIR=/home/limjiayee/ims_wsd_emb
+LIB_DIR=$IMS_DIR/lib
+
+MODEL_DIR=$1
+TEST_FILE=$2
+STORE_DIR=$3
+
+JAVA_HOME=/home/limjiayee/jdk1.8.0_131/bin
+CLASSPATH=$LIB_DIR/*:$IMS_DIR/ims_embed.jar
+
 export LANG=en_US
+
+# -Xms (different from -Xmx which refers to the maximum)
+# The -Xms option sets the initial and minimum Java heap size. The Java heap is the part of the memory
+# where blocks of memory are allocated to objects and freed during garbage collection.
+# Note: -Xms does not limit the total amount of memory that the JVM can use.
+
+# If index.sense is specified: Add "-is index.sense" to command
 if [ $# -ge 4 ]; then
-  java -Xmx30G -Xms30G -cp $CP sg.edu.nus.comp.nlp.ims.implement.CTester -ptm $libdir/tag.bin.gz -tagdict $libdir/tagdict.txt -ssm $libdir/EnglishSD.bin.gz -prop $libdir/prop.xml -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter $testfile $modeldir $modeldir $savedir -is $4 -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination  -emb /home/camille/clean/embed/context2vec.ukwac.words.targets -ws 10 -str 'EXP'
+    $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
+        -ptm $LIB_DIR/tag.bin.gz \
+        -tagdict $LIB_DIR/tagdict.txt \
+        -ssm $LIB_DIR/EnglishSD.bin.gz \
+        -prop $LIB_DIR/prop.xml \
+        -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter \
+        $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
+        -is $4 \
+        -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
+        -emb /home/limjiayee/embedding/context2vec.ukwac.words.targets \
+        -ws 10 -str 'EXP'
 else
-  java -Xmx30G -Xms30G -cp $CP sg.edu.nus.comp.nlp.ims.implement.CTester -ptm $libdir/tag.bin.gz -tagdict $libdir/tagdict.txt -ssm $libdir/EnglishSD.bin.gz -prop $libdir/prop.xml -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter $testfile $modeldir $modeldir $savedir -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination  -emb /home/camille/clean/embed/context2vec.ukwac.words.targets -ws 10 -str 'EXP'
+    $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
+        -ptm $LIB_DIR/tag.bin.gz \
+        -tagdict $LIB_DIR/tagdict.txt \
+        -ssm $LIB_DIR/EnglishSD.bin.gz \
+        -prop $LIB_DIR/prop.xml \
+        -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter \
+        $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
+        -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
+        -emb /home/limjiayee/embedding/context2vec.ukwac.words.targets \
+        -ws 10 -str 'EXP'
 fi
+
