@@ -23,7 +23,8 @@ if [ $# -ge 4 ]; then
         -tagdict $LIB_DIR/tagdict.txt \
         -ssm $LIB_DIR/EnglishSD.bin.gz \
         -prop $LIB_DIR/prop.xml \
-        -r sg.edu.nus.comp.nlp.ims.io.CFullResultWriter \
+        -c sg.edu.nus.comp.nlp.ims.corpus.CAllWordsCoarseTaskCorpus \
+        -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -is $4 \
         -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
@@ -35,7 +36,8 @@ else
         -tagdict $LIB_DIR/tagdict.txt \
         -ssm $LIB_DIR/EnglishSD.bin.gz \
         -prop $LIB_DIR/prop.xml \
-        -r sg.edu.nus.comp.nlp.ims.io.CFullResultWriter \
+        -c sg.edu.nus.comp.nlp.ims.corpus.CAllWordsCoarseTaskCorpus \
+        -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
         -emb /home/limjiayee/embedding/context2vec.ukwac.words.targets \
