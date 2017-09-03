@@ -19,7 +19,7 @@ CLASSPATH=$LIB_DIR/*:$IMS_DIR/ims_embed.jar
 
 export LANG=en_US
 
-$JAVA_HOME/java -mx8192m -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
+$JAVA_HOME/java -mx30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
     -ptm $LIB_DIR/tag.bin.gz \
     -tagdict $LIB_DIR/tagdict.txt \
     -ssm $LIB_DIR/EnglishSD.bin.gz \
