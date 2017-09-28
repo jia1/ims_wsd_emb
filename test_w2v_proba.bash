@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -lt 3 ]; then
-    echo "$0 MODEL_DIR TEST_FILE STORE_DIR index.sense(option)"
+    echo "$0 MODEL_DIR TEST_FILE LEXELT_FILE STORE_DIR index.sense(option)"
     exit
 fi
 
@@ -10,24 +10,26 @@ LIB_DIR=$IMS_DIR/lib
 
 MODEL_DIR=$1
 TEST_FILE=$2
-STORE_DIR=$3
+LEXELT_FILE=$3
+STORE_DIR=$4
 
 JAVA_HOME=/home/limjiayee/jdk1.8.0_131/bin
 CLASSPATH=$LIB_DIR/*:$IMS_DIR/ims_embed.jar
 
 export LANG=en_US
 
-if [ $# -ge 4 ]; then
+if [ $# -ge 5 ]; then
     $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
         -ptm $LIB_DIR/tag.bin.gz \
         -tagdict $LIB_DIR/tagdict.txt \
         -ssm $LIB_DIR/EnglishSD.bin.gz \
         -prop $LIB_DIR/prop.xml \
-        -c sg.edu.nus.comp.nlp.ims.corpus.CAllWordsCoarseTaskCorpus \
+        -c sg.edu.nus.comp.nlp.ims.corpus.CAllWordsFineTaskCorpus \
         -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
-        -is $4 -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/embedding/2017_dim400_vectors.txt \
+        -is $5 -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
+        -lexelt $LEXELT_FILE \
+        -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
         -ws 10 -str 'EXP'
 else
     $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
@@ -35,11 +37,12 @@ else
         -tagdict $LIB_DIR/tagdict.txt \
         -ssm $LIB_DIR/EnglishSD.bin.gz \
         -prop $LIB_DIR/prop.xml \
-        -c sg.edu.nus.comp.nlp.ims.corpus.CAllWordsCoarseTaskCorpus \
+        -c sg.edu.nus.comp.nlp.ims.corpus.CAllWordsFineTaskCorpus \
         -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/embedding/2017_dim400_vectors.txt \
+        -lexelt $LEXELT_FILE \
+        -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
         -ws 10 -str 'EXP'
 fi
 

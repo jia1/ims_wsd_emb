@@ -31,6 +31,6 @@ $JAVA_HOME/java -mx30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester 
     -f sg.edu.nus.comp.nlp.ims.feature.CAllWordsFeatureExtractorCombination \
     -e sg.edu.nus.comp.nlp.ims.classifiers.CLibLinearEvaluator \
     -lexelt $LEXELT_FILE \
-    -emb /home/limjiayee/embedding/2017_dim400_vectors.txt \
+    -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
     -ws 10 -str 'EXP'
 
