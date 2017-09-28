@@ -33,8 +33,10 @@ if [ $# -ge 4 ]; then
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -is $4 \
         -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/embedding/context2vec.ukwac.words.targets \
-        -ws 10 -str 'EXP'
+        # -emb /home/limjiayee/embedding/context2vec.ukwac.words.targets \
+        -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
+        -ws 10 -str 'EXP' \
+        -type 'directory'
 else
     $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
         -ptm $LIB_DIR/tag.bin.gz \
@@ -44,7 +46,9 @@ else
         -r sg.edu.nus.comp.nlp.ims.io.CAllWordsResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/embedding/context2vec.ukwac.words.targets \
-        -ws 10 -str 'EXP'
+        # -emb /home/limjiayee/embedding/context2vec.ukwac.words.targets \
+        -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
+        -ws 10 -str 'EXP' \
+        -type 'directory'
 fi
 

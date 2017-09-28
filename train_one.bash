@@ -51,5 +51,5 @@ $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement
     -s2 $s2 -c2 $c2 \
     -emb /home/limjiayee/embedding/2017_dim400_vectors.txt \
     -ws 10 -str 'EXP' \
-    -type 'file' \
+    -type 'directory' \
 
