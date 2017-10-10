@@ -49,7 +49,7 @@ $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement
     $1 $2 $3 \
     -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
     -s2 $s2 -c2 $c2 \
-    -emb /home/limjiayee/embedding/2017_dim400_vectors.txt \
+    -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
     -ws 10 -str 'EXP' \
     -type 'directory' \
 
