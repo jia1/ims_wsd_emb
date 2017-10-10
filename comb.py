@@ -12,8 +12,6 @@ result_dir, key_dir = args[1:]
 result_dir = os.path.abspath(result_dir)
 key_dir = os.path.abspath(key_dir)
 
-print(result_dir, key_dir)
-
 fin_result_fn, fin_key_fn = 'fin.result', 'fin.key'
 
 def comb(src_dir, src_ext, dst_fn):
