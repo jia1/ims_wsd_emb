@@ -3,14 +3,13 @@ import sys
 
 args = sys.argv
 
-if len(args) len(args) != 2:
+if len(args) != 2:
     exit('Usage: python proc.py result_file/directory')
 
 result_file = args[1]
 
 def process_one(result_file):
-    process_one(result_file):
-        processed_lines = []
+    processed_lines = []
     with open(result_file, 'r') as f:
         for line in f:
             split_line = line.split(' ')
