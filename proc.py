@@ -14,16 +14,16 @@ def process_one(result_file):
         for line in f:
             split_line = line.strip().split(' ')
             if len(split_line) >= 3:
-                word_id = split_line[1].split('.')[0].split('%')[0]
+                word_id = result_file.split('/')[-1].split('.')[0]
                 best_sense, best_prob = '', 0
                 for i in range(2, len(split_line)-1, 2):
                     curr_sense, curr_prob = split_line[i], split_line[i+1]
                     if curr_prob > best_prob:
                         best_sense, best_prob = curr_sense, curr_prob
-                if split_line[1].split('.')[0] == word_id:
-                    processed_lines.append('{0} {1} {2}\n'.format(word_id, split_line[1], best_sense))
-                else:
+                if split_line[0].split('.')[0] == word_id:
                     processed_lines.append('{0} {1} {2}\n'.format(word_id, split_line[0], best_sense))
+                else:
+                    processed_lines.append('{0} {1} {2}\n'.format(word_id, split_line[1], best_sense))
     with open(result_file, 'w') as g:
         g.writelines(processed_lines)
 
