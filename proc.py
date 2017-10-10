@@ -20,8 +20,7 @@ def process_one(result_file):
         g.writelines(processed_lines)
 
 if os.path.isdir(result_file):
-    files = [f for f in os.listdir(result_file) if os.path.isfile(f)]
-    for f in files:
-        process_one(f)
+    for f in os.listdir(result_file):
+        process_one(os.path.join(result_file, f))
 else:
     process_one(result_file)
