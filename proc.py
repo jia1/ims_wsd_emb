@@ -6,7 +6,7 @@ args = sys.argv
 if len(args) != 2:
     exit('Usage: python proc.py result_file/directory')
 
-result_file = args[1]
+result_file = os.path.abspath(args[1])
 
 def process_one(result_file):
     processed_lines = []
@@ -20,7 +20,7 @@ def process_one(result_file):
         g.writelines(processed_lines)
 
 if os.path.isdir(result_file):
-    files = [f for f in os.listdir('.') if os.path.isfile(f)]
+    files = [f for f in os.listdir(result_file) if os.path.isfile(f)]
     for f in files:
         process_one(f)
 else:
