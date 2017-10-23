@@ -1,1 +1,1 @@
-nohup time ./train_one.bash ../omsti-data/noun ../omsti-data/noun ../models-omsti-emb &> nohup-train-omsti-noun.out &
+nohup time ./train_one.bash ../omsti-data/adv ../omsti-data/adv ../models-omsti-emb &> nohup-train-omsti-adv.out &
