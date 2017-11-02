@@ -26,7 +26,7 @@ if [ $# -ge 5 ]; then
         -r sg.edu.nus.comp.nlp.ims.io.CFullResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -is $5 -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
+        -emb /home/limjiayee/word2vec/w2v-200-1b-win-10.txt \
         -ws 10 -str 'EXP' \
         -type 'directory'
 else
@@ -38,8 +38,10 @@ else
         -r sg.edu.nus.comp.nlp.ims.io.CFullResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
+        -emb /home/limjiayee/word2vec/w2v-200-1b-win-10.txt \
         -ws 10 -str 'EXP' \
         -type 'directory'
 fi
 
+# -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
+# -emb /home/limjiayee/word2vec/w2v-800-wikiFeb2017.txt
