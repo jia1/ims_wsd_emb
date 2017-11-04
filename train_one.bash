@@ -28,8 +28,8 @@ CLASSPATH=$LIB_DIR/*:$IMS_DIR/ims_embed.jar
 export LANG=en_US
 
 # EMB_FILE=$HOME/embedding/context2vec.ukwac.words.targets
-# EMB_FILE=$HOME/word2vec/w2v-300-win-10-1b.txt \
-EMB_FILE=$HOME/word2vec/w2v-800-win-10-wikiFeb2017.txt \
+EMB_FILE=$HOME/word2vec/w2v-300-win-10-1b.txt
+# EMB_FILE=$HOME/word2vec/w2v-800-win-10-wikiFeb2017.txt
 
 # See scorer.bash for more details on Java command line arguments -Xmx and -cp.
 

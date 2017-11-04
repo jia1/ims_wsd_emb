@@ -1,4 +1,4 @@
-WS=se2
+WS=se3
 WS_TASK=${WS}-lex
 
 # EMB_OPT_SRC=w2v-800-win-10-wikiFeb2017
@@ -17,7 +17,7 @@ cp $RESULT_DIR/* $PROC_RESULT_DIR
 python proc-${WS}.py $PROC_RESULT_DIR
 python comb.py $PROC_RESULT_DIR $KEY_DIR
 
-./scorer.bash fin-${WS}-${EMB_OPT_SRC}.result fin-${WS}-${EMB_OPT_SRC}.key \
+./scorer.bash fin.result fin.key \
     > score-${WS}-${EMB_OPT_SRC}.out
 cat score-${WS}-${EMB_OPT_SRC}.out
 
