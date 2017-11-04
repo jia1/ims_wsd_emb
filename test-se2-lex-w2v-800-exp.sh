@@ -1,2 +1,0 @@
-# nohup time ./test_w2v_proba.bash ../models-se2-lex-emb-wikiFeb2017 ../se2/1-lexical-sample/processed/test ../results/se2-lex-w2v-800-exp-wikiFeb2017 &> nohup-test-se2-lex-w2v-800-exp-wikiFeb2017.out &
-nohup time ./test_w2v_proba.bash ../models-se2-lex-emb-1b-200-win-10 ../se2/1-lexical-sample/processed/test ../results/se2-lex-w2v-200-exp-1b-win-10 &> nohup-test-se2-lex-w2v-200-exp-1b-win-10.out &

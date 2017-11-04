@@ -18,7 +18,7 @@ CLASSPATH=$LIB_DIR/*:$IMS_DIR/ims_embed.jar
 export LANG=en_US
 
 if [ $# -ge 5 ]; then
-    $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
+    $JAVA_HOME/java -Xmx30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
         -ptm $LIB_DIR/tag.bin.gz \
         -tagdict $LIB_DIR/tagdict.txt \
         -ssm $LIB_DIR/EnglishSD.bin.gz \
@@ -30,7 +30,7 @@ if [ $# -ge 5 ]; then
         -ws 10 -str 'EXP' \
         -type 'directory'
 else
-    $JAVA_HOME/java -Xmx30G -Xms30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
+    $JAVA_HOME/java -Xmx30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
         -ptm $LIB_DIR/tag.bin.gz \
         -tagdict $LIB_DIR/tagdict.txt \
         -ssm $LIB_DIR/EnglishSD.bin.gz \
