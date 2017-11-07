@@ -1,12 +1,12 @@
-WS=se3
+WS=se${1}
 WS_TASK=${WS}-lex
 STRAT=exp
 
-EMB_OPT_SRC=w2v-100-win-10-1b
-# EMB_OPT_SRC=w2v-800-win-10-wikiFeb2017
+# EMB_OPT_SRC=w2v-200-win-05-1b
+EMB_OPT_SRC=w2v-800-win-10-wikiFeb2017
 
-MODEL_DIR=../models-${WS_TASK}-${EMB_OPT_SRC}
-TEST_DIR=../se2/1-lexical-sample/processed/test
+MODEL_DIR=../models-${WS_TASK}-${EMB_OPT_SRC}-${STRAT}
+TEST_DIR=../$WS/1-lexical-sample/processed/test
 RESULT_DIR=../results/${WS_TASK}-${EMB_OPT_SRC}-${STRAT}
 NOHUP_FILE=nohup-test-${WS_TASK}-${EMB_OPT_SRC}-${STRAT}.out
 

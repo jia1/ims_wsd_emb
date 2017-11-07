@@ -1,4 +1,4 @@
-WS=se3
+WS=se${1}
 WS_TASK=${WS}-lex
 
 # EMB_OPT_SRC=w2v-800-win-10-wikiFeb2017

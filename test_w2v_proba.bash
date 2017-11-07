@@ -5,15 +5,20 @@ if [ $# -lt 3 ]; then
     exit
 fi
 
-IMS_DIR=/home/limjiayee/ims_wsd_emb
+# IMS_DIR=/home/limjiayee/ims_wsd_emb
+IMS_DIR=$(pwd)
 LIB_DIR=$IMS_DIR/lib
 
 MODEL_DIR=$1
 TEST_FILE=$2
 STORE_DIR=$3
 
-JAVA_HOME=/home/limjiayee/jdk1.8.0_131/bin
+JAVA_HOME=$HOME/jdk1.8.0_131/bin
 CLASSPATH=$LIB_DIR/*:$IMS_DIR/ims_embed.jar
+
+# EMB_FILE=$HOME/embedding/2017_dim800_vectors.txt
+# EMB_FILE=$HOME/word2vec/w2v-200-win-05-1b.txt
+EMB_FILE=$HOME/word2vec/w2v-800-win-10-wikiFeb2017.txt
 
 export LANG=en_US
 
@@ -26,7 +31,7 @@ if [ $# -ge 5 ]; then
         -r sg.edu.nus.comp.nlp.ims.io.CFullResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -is $5 -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/word2vec/w2v-200-1b-win-10.txt \
+        -emb $EMB_FILE \
         -ws 10 -str 'EXP' \
         -type 'directory'
 else
@@ -38,10 +43,8 @@ else
         -r sg.edu.nus.comp.nlp.ims.io.CFullResultWriter \
         $TEST_FILE $MODEL_DIR $MODEL_DIR $STORE_DIR \
         -f sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination \
-        -emb /home/limjiayee/word2vec/w2v-200-1b-win-10.txt \
+        -emb $EMB_FILE \
         -ws 10 -str 'EXP' \
         -type 'directory'
 fi
 
-# -emb /home/limjiayee/embedding/2017_dim800_vectors.txt \
-# -emb /home/limjiayee/word2vec/w2v-800-wikiFeb2017.txt

@@ -1,4 +1,4 @@
-WS=se3
+WS=se${1}
 WS_TASK=${WS}-lex
 STRAT=exp
 
