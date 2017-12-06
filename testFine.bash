@@ -18,7 +18,8 @@ SENSE_INDEX=$5
 JAVA_HOME=$HOME/jdk1.8.0_131/bin
 CLASSPATH=$LIB_DIR/*:$IMS_DIR/ims_embed.jar
 
-EMB_FILE=$HOME/embedding/2017_dim800_vectors.txt
+# EMB_FILE=$HOME/embedding/2017_dim800_vectors.txt
+EMB_FILE=$HOME/word2vec/w2v-800-win-10-wikiFeb2017.txt
 
 export LANG=en_US
 

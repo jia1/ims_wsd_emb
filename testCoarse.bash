@@ -16,9 +16,11 @@ senseIndex=$4
 JAVA_HOME=/home/limjiayee/jdk1.8.0_131/bin
 CLASSPATH=$ldir/*:$bdir/ims_embed.jar
 
+EMB_FILE=$HOME/word2vec/w2v-800-win-10-wikiFeb2017.txt
+
 export LANG=en_US
 
-$JAVA_HOME/java -mx2500m -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
+$JAVA_HOME/java -mx30G -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTester \
     -ptm $ldir/tag.bin.gz \
     -tagdict $ldir/tagdict.txt \
     -ssm $ldir/EnglishSD.bin.gz \
@@ -28,5 +30,7 @@ $JAVA_HOME/java -mx2500m -cp $CLASSPATH sg.edu.nus.comp.nlp.ims.implement.CTeste
     -is $senseIndex \
     $testFile $modelDir $modelDir $savePath \
     -e sg.edu.nus.comp.nlp.ims.classifiers.CLibLinearEvaluator \
-    -f sg.edu.nus.comp.nlp.ims.feature.CAllWordsFeatureExtractorCombination
+    -f sg.edu.nus.comp.nlp.ims.feature.CAllWordsFeatureExtractorCombination \
+    -emb $EMB_FILE \
+    -ws 10 -str 'EXP'
 
