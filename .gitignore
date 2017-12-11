@@ -1,2 +1,5 @@
 examples/
+lib/
 *.out
+.classpath
+.project

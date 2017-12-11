@@ -1,0 +1,15 @@
+/ABinaryFeature.class
+/AListFeature.class
+/ANumericFeature.class
+/CAllWordsFeatureExtractorCombination.class
+/CCollocation.class
+/CCollocationExtractor.class
+/CDoubleFeature.class
+/CFeatureExtractorCombination$Builder.class
+/CFeatureExtractorCombination.class
+/CPOSFeature.class
+/CPOSFeatureExtractor.class
+/CSurroundingWord.class
+/CSurroundingWordExtractor.class
+/IFeature.class
+/IFeatureExtractor.class

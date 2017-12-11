@@ -1,0 +1,14 @@
+/APreloadEvaluator.class
+/CGISEvaluator.class
+/CGISModelTrainer.class
+/CLibLinearEvaluator.class
+/CLibLinearTrainer.class
+/CLibSVMEvaluator.class
+/CLibSVMTrainer.class
+/CMultiClassesSVM.class
+/CWekaEvaluator.class
+/CWekaModelTrainer.class
+/GravesLSTMCharModellingExample.class
+/IEvaluator.class
+/IModelTrainer.class
+/CGravesLSTMTrainer.class
