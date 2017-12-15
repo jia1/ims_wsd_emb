@@ -45,7 +45,7 @@ import sg.edu.nus.comp.nlp.ims.util.COpenNLPSentenceSplitter;
  *
  * @author zhongzhi
  * 
- * Modified by
+ * Modified by @author Jiayee
  *
  */
 public class CTrainModel {
@@ -157,6 +157,7 @@ public class CTrainModel {
 			
 		if (!embFile.isEmpty()) {
 			switch(this.integrationStrategy) {
+			/*
 			case "CON":
 				builder.addConcatenatedEmbeddingFeature(embFile, windowSize);
 				break;
@@ -168,6 +169,10 @@ public class CTrainModel {
 				break;
 			case "EXP":
 				builder.addExponentialDecayedEmbeddingFeature(embFile, windowSize);
+				break;
+			*/
+			case "CON":
+				builder.addConcatenatedEmbeddingFeature(embFile, windowSize);
 				break;
 			}
 		}

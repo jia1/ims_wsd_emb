@@ -5,13 +5,14 @@
  *
  * IMS EMBED is an output of the MultiJEDI ERC Starting Grant No. 259234.
  * IMS EMBED is licensed under a Creative Commons Attribution - Noncommercial - Share Alike 3.0 License.
+ *
+ * Modified by @author Jiayee
  */
 package pkg.feature;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,17 +20,12 @@ import pkg.feature.emb.IntegrationStrategy;
 import sg.edu.nus.comp.nlp.ims.corpus.ICorpus;
 import sg.edu.nus.comp.nlp.ims.corpus.IItem;
 import sg.edu.nus.comp.nlp.ims.corpus.ISentence;
-import sg.edu.nus.comp.nlp.ims.feature.CDoubleFeature;
 import sg.edu.nus.comp.nlp.ims.feature.IFeature;
 import sg.edu.nus.comp.nlp.ims.feature.IFeatureExtractor;
 
 /**
  * Embeddings feature extractor.
  * based on @CSurroundingWordExtractor made by @author zhongzhi
-
- *
- * 
- *
  */
 public class CEmbeddingsDimensionExtractor implements IFeatureExtractor {
 

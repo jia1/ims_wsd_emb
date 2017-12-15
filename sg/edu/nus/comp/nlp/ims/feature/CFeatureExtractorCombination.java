@@ -16,7 +16,7 @@ import sg.edu.nus.comp.nlp.ims.corpus.ICorpus;
  *
  * @author zhongzhi
  * 
- * Modified by
+ * Modified by @author Jiayee
  *
  */
 public class CFeatureExtractorCombination implements IFeatureExtractor {
@@ -63,7 +63,8 @@ public class CFeatureExtractorCombination implements IFeatureExtractor {
 			features.add(new CSurroundingWordExtractor());
 			return this;
 		}
-		
+
+		/*
 		public Builder addConcatenatedEmbeddingFeature(String file, int windowSize) {
 			features.add(new CEmbeddingsDimensionExtractor(file, IntegrationStrategy.concatenation(windowSize)));
 			return this;
@@ -83,7 +84,13 @@ public class CFeatureExtractorCombination implements IFeatureExtractor {
 			features.add(new CEmbeddingsDimensionExtractor(file, IntegrationStrategy.exponential(windowSize)));
 			return this;
 		}
-		
+		*/
+
+		public Builder addConcatenatedEmbeddingFeature(String file, int windowSize) {
+			features.add(new CEmbeddingsDimensionExtractor(file, IntegrationStrategy.concatenation(windowSize)));
+			return this;
+		}
+
 		public IFeatureExtractor build() {
 			return new CFeatureExtractorCombination(features);
 		}

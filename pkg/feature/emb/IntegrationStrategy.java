@@ -5,12 +5,17 @@
  *
  * IMS EMBED is an output of the MultiJEDI ERC Starting Grant No. 259234.
  * IMS EMBED is licensed under a Creative Commons Attribution - Noncommercial - Share Alike 3.0 License.
+ *
+ * Modified by @author Jiayee
  */
 package pkg.feature.emb;
+
+import java.util.ArrayList;
 
 import pkg.feature.CEmbeddingsDimensionExtractor;
 import sg.edu.nus.comp.nlp.ims.corpus.IItem;
 import sg.edu.nus.comp.nlp.ims.feature.CDoubleFeature;
+import sg.edu.nus.comp.nlp.ims.feature.CVectorSequenceFeature;
 import sg.edu.nus.comp.nlp.ims.feature.IFeature;
 
 public abstract class IntegrationStrategy {
@@ -28,7 +33,8 @@ public abstract class IntegrationStrategy {
 	protected String formEmbeddingDimensionName(int p_EmbeddingDimensionIndex) {
 		return "DIM_" + p_EmbeddingDimensionIndex;
 	}
-	
+
+	/*
 	public static IntegrationStrategy concatenation(int windowSize) {
 		return new IntegrationStrategy(windowSize) {
 			public String getEmbeddingDimension(CEmbeddingsDimensionExtractor extractor, int p_EmbeddingDimensionIndex) {
@@ -170,6 +176,37 @@ public abstract class IntegrationStrategy {
 				if (extractor.getM_EmbeddingDimensionIndex() >= 0 && extractor.getM_EmbeddingDimensionIndex() < extractor.getVectorSize()) {
 					feature = new CDoubleFeature();
 					
+					feature.setKey(this.formEmbeddingDimensionName(extractor.getM_EmbeddingDimensionIndex()));
+					feature.setValue(getEmbeddingDimension(extractor, extractor.getM_EmbeddingDimensionIndex()));
+					extractor.setM_EmbeddingDimensionIndex(extractor.getM_EmbeddingDimensionIndex() + 1);
+				}
+				return feature;
+			}
+
+		};
+	}
+	*/
+
+	public static IntegrationStrategy concatenation(int windowSize) {
+		return new IntegrationStrategy(windowSize) {
+			public String getEmbeddingDimension(CEmbeddingsDimensionExtractor extractor, int p_EmbeddingDimensionIndex) {
+				ArrayList<String> val = new ArrayList<>();
+				for (int i = extractor.getM_IndexInSentence() - WINDOW; i <= extractor.getM_IndexInSentence() + WINDOW; i++) {
+					if (i > -1 && i < extractor.getSentenceSize()) {
+						IItem item = extractor.getItem(i);
+						String dim = item.get(0).toLowerCase();
+						if (extractor.getWordMap().containsKey(dim)) {
+							val.add(Double.toString(extractor.getWordMap().get(dim)[p_EmbeddingDimensionIndex]));
+						}
+					}
+				}
+				return String.join(",", val);
+			}
+
+			public IFeature getNext(CEmbeddingsDimensionExtractor extractor) {
+				IFeature feature = null;
+				if (extractor.getM_EmbeddingDimensionIndex() >= 0 && extractor.getM_EmbeddingDimensionIndex() < extractor.getVectorSize()) {
+					feature = new CVectorSequenceFeature();
 					feature.setKey(this.formEmbeddingDimensionName(extractor.getM_EmbeddingDimensionIndex()));
 					feature.setValue(getEmbeddingDimension(extractor, extractor.getM_EmbeddingDimensionIndex()));
 					extractor.setM_EmbeddingDimensionIndex(extractor.getM_EmbeddingDimensionIndex() + 1);

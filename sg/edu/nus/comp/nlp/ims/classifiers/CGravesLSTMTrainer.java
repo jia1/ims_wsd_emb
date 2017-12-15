@@ -20,6 +20,12 @@ import sg.edu.nus.comp.nlp.ims.lexelt.CModelInfo;
 import sg.edu.nus.comp.nlp.ims.lexelt.ILexelt;
 import sg.edu.nus.comp.nlp.ims.lexelt.IStatistic;
 
+/**
+ * 
+ * @author Jiayee
+ *
+ */
+
 public class CGravesLSTMTrainer implements IModelTrainer {
 	/* (non-Javadoc)
 	 * @see sg.edu.nus.comp.nlp.ims.classifiers.IModelTrainer#setOptions(java.lang.String[])
