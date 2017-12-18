@@ -201,7 +201,7 @@ public class CEmbeddingsDimensionExtractor implements IFeatureExtractor {
 		this.m_EmbeddingDimensionIndex = m_EmbeddingDimensionIndex;
 	}
 	
-	protected String getEmbeddingDimension(int p_EmbeddingDimensionIndex) {
+	protected double[] getEmbeddingDimension(int p_EmbeddingDimensionIndex) {
 		return strategy.getEmbeddingDimension(this, p_EmbeddingDimensionIndex);
 	}
 

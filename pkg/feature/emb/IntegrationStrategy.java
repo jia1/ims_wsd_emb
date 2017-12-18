@@ -11,6 +11,7 @@
 package pkg.feature.emb;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import pkg.feature.CEmbeddingsDimensionExtractor;
 import sg.edu.nus.comp.nlp.ims.corpus.IItem;
@@ -26,7 +27,7 @@ public abstract class IntegrationStrategy {
 		this.WINDOW = windowSize;
 	}
 
-	public abstract String getEmbeddingDimension(CEmbeddingsDimensionExtractor extractor, int p_EmbeddingDimensionIndex);
+	public abstract double[] getEmbeddingDimension(CEmbeddingsDimensionExtractor extractor, int p_EmbeddingDimensionIndex);
 	
 	public abstract IFeature getNext(CEmbeddingsDimensionExtractor extractor);
 	
@@ -189,18 +190,24 @@ public abstract class IntegrationStrategy {
 
 	public static IntegrationStrategy concatenation(int windowSize) {
 		return new IntegrationStrategy(windowSize) {
-			public String getEmbeddingDimension(CEmbeddingsDimensionExtractor extractor, int p_EmbeddingDimensionIndex) {
-				ArrayList<String> val = new ArrayList<>();
-				for (int i = extractor.getM_IndexInSentence() - WINDOW; i <= extractor.getM_IndexInSentence() + WINDOW; i++) {
+			public double[] getEmbeddingDimension(CEmbeddingsDimensionExtractor extractor, int p_EmbeddingDimensionIndex) {
+				double[] vector = new double[WINDOW + 1];
+				int firstIndex = extractor.getM_IndexInSentence() - WINDOW;
+				int lastIndex = extractor.getM_IndexInSentence() + WINDOW;
+				for (int i = firstIndex; i <= lastIndex; i++) {
 					if (i > -1 && i < extractor.getSentenceSize()) {
 						IItem item = extractor.getItem(i);
 						String dim = item.get(0).toLowerCase();
 						if (extractor.getWordMap().containsKey(dim)) {
-							val.add(Double.toString(extractor.getWordMap().get(dim)[p_EmbeddingDimensionIndex]));
+							vector[i - firstIndex] = extractor.getWordMap().get(dim)[p_EmbeddingDimensionIndex];
+						} else {
+							vector[i - firstIndex] = 0;
 						}
+					} else {
+						vector[i - firstIndex] = 0;
 					}
 				}
-				return String.join(",", val);
+				return vector;
 			}
 
 			public IFeature getNext(CEmbeddingsDimensionExtractor extractor) {
@@ -208,7 +215,7 @@ public abstract class IntegrationStrategy {
 				if (extractor.getM_EmbeddingDimensionIndex() >= 0 && extractor.getM_EmbeddingDimensionIndex() < extractor.getVectorSize()) {
 					feature = new CVectorSequenceFeature();
 					feature.setKey(this.formEmbeddingDimensionName(extractor.getM_EmbeddingDimensionIndex()));
-					feature.setValue(getEmbeddingDimension(extractor, extractor.getM_EmbeddingDimensionIndex()));
+					feature.setValue(Arrays.toString(getEmbeddingDimension(extractor, extractor.getM_EmbeddingDimensionIndex())));
 					extractor.setM_EmbeddingDimensionIndex(extractor.getM_EmbeddingDimensionIndex() + 1);
 				}
 				return feature;
