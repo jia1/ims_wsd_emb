@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sg.edu.nus.comp.nlp.ims.classifiers.CLibLinearTrainer;
+import sg.edu.nus.comp.nlp.ims.classifiers.CGravesLSTMTrainer;
 import sg.edu.nus.comp.nlp.ims.classifiers.IModelTrainer;
 import sg.edu.nus.comp.nlp.ims.corpus.ACorpus;
 import sg.edu.nus.comp.nlp.ims.corpus.CLexicalCorpus;
@@ -54,7 +54,7 @@ public class CTrainModel {
 	// models
 	protected ArrayList<Object> m_Models = new ArrayList<Object>();
 	// model trainer
-	protected IModelTrainer m_Trainer = new CLibLinearTrainer();
+	protected IModelTrainer m_Trainer = new CGravesLSTMTrainer();
 	// model writer
 	protected IModelWriter m_Writer = new CModelWriter();
 	// corpus class name
@@ -79,8 +79,7 @@ public class CTrainModel {
 	
 	// embeddings window size
 	protected int windowSize;
-	
-	// embeddings window size
+
 	protected String integrationStrategy;
 	
 	// embeddings only flag 
@@ -119,6 +118,24 @@ public class CTrainModel {
 
 	/**
 	 * train model with given xml and key
+	 * 
+	 * Sample key file format:
+	 * 
+	 * SensEval 2 all-words task:
+	 * d02 d02.s81.t14 publish%2:32:00::
+	 * 
+	 * SensEval 3 all-words task:
+	 * d002 d002.s142.t001 be%2:42:03::
+	 * 
+	 * SemEval 2007 fine-grained all-words task:
+	 * <answer head="d02.s57.t20" senseid="salute%2:32:01::"/>
+	 * Reformatted:
+	 * d02 d02.s57.t20 salute%2:32:01::
+	 * 
+	 * SemEval 2007 coarse-grained all-words task:
+	 * d005 d005.s034.t008 great%5:00:01:important:00 great%5:00:00:good:01 great%5:00:00:enthusiastic:00
+	 * 
+	 * Documented by @author Jiayee
 	 *
 	 * @param p_XmlReader
 	 *            train xml file reader
@@ -129,13 +146,14 @@ public class CTrainModel {
 	 */
 	public void train(Reader p_XmlReader, BufferedReader p_KeyReader, String embFile)
 			throws Exception {
-		StringTokenizer tokenizer = null;
-		Hashtable<String, String[]> tags = new Hashtable<String, String[]>();
+		// 1. Read key file and store { instance id: [sense id] } as a hash map in memory
+		StringTokenizer tokenizer = null; // works like an iterator of tokens once initialized with a string
+		Hashtable<String, String[]> tags = new Hashtable<String, String[]>(); // { instance id: [sense id] }
 		String id;
 		String line;
 		while ((line = p_KeyReader.readLine()) != null) {
 			tokenizer = new StringTokenizer(line);
-			tokenizer.nextToken();
+			tokenizer.nextToken(); // Skip first token (e.g. d02, d002, etc.)
 			id = tokenizer.nextToken();
 			String[] ss = new String[tokenizer.countTokens()];
 			int i = 0;
@@ -145,74 +163,130 @@ public class CTrainModel {
 			tags.put(id, ss);
 		}
 
+		// 2. Create corpus instance depending on the corpus/task type
+		// E.g. CAllWordsCoarseTaskCorpus, CAllWordsFineTaskCorpus, CAllWordsPlainCorpus, CLexicalCorpus (default)
 		ACorpus corpus = (ACorpus) Class.forName(this.m_CorpusName).newInstance();
+
+		// 3. Initialize the feature extractor builder (which accepts any number of feature extractors)
 		CFeatureExtractorCombination.Builder builder = new CFeatureExtractorCombination.Builder();
 		
-		if (!this.onlyEmbed) 			
-			if (!this.skipPOS)
+		// 4. Add the true feature extractors
+		if (!this.onlyEmbed) {
+			if (!this.skipPOS) {
 				builder = builder.addPOSFeature();
-			if (!this.skipCol)
+			}
+			if (!this.skipCol) {
 				builder = builder.addCollocationFeature();
-			if (!this.skipSur)
+			}
+			if (!this.skipSur) {
 				builder = builder.addSurroundingWordFeature();
-			
+			}
+		}
 		if (!embFile.isEmpty()) {
 			switch(this.integrationStrategy) {
-			/*
-			case "CON":
-				builder.addConcatenatedEmbeddingFeature(embFile, windowSize);
-				break;
-			case "AVG":
-				builder.addAveragedEmbeddingFeature(embFile, windowSize);
-				break;
-			case "FRA":
-				builder.addFractionalDecayedEmbeddingFeature(embFile, windowSize);
-				break;
-			case "EXP":
-				builder.addExponentialDecayedEmbeddingFeature(embFile, windowSize);
-				break;
-			*/
-			case "CON":
-				builder.addConcatenatedEmbeddingFeature(embFile, windowSize);
-				break;
+				/*
+				case "CON":
+					builder.addConcatenatedEmbeddingFeature(embFile, windowSize);
+					break;
+				case "AVG":
+					builder.addAveragedEmbeddingFeature(embFile, windowSize);
+					break;
+				case "FRA":
+					builder.addFractionalDecayedEmbeddingFeature(embFile, windowSize);
+					break;
+				case "EXP":
+					builder.addExponentialDecayedEmbeddingFeature(embFile, windowSize);
+					break;
+				*/
+				case "CON":
+					builder.addConcatenatedEmbeddingFeature(embFile, windowSize);
+					break;
 			}
 		}
 
-		IFeatureExtractor featExtractor = builder.build(); 
-		IInstanceExtractor instExtractor = (IInstanceExtractor) Class.forName(this.m_InstanceExtractorName).newInstance();
+		// 4. Build and instantiate a master feature extractor
+		IFeatureExtractor featExtractor = builder.build();
+
+		// 5. Set the corpus instance properties and load the training corpus file into the corpus instance
 		if (this.m_Delimiter != null) {
 			corpus.setDelimiter(this.m_Delimiter);
 		}
-		corpus.setSplit(this.m_Split);
-		corpus.setTokenized(this.m_Tokenized);
-		corpus.setPOSTagged(this.m_POSTagged);
-		corpus.setLemmatized(this.m_Lemmatized);
-
+		corpus.setSplit(this.m_Split); // Whether sentence-split or not
+		corpus.setTokenized(this.m_Tokenized); // Whether tokenized or not
+		corpus.setPOSTagged(this.m_POSTagged); // Whether POS-tagged or not
+		corpus.setLemmatized(this.m_Lemmatized); // Whether lemmatized or not
 		corpus.load(p_XmlReader);
+
+		// 6. Create an instance extractor (i.e. CInstanceExtractor)
+		/**
+		 * Sample instances
+		 * 
+		 * SensEval 2 all-words task
+		 * <?xml version="1.0"?>
+		 * <!DOCTYPE corpus SYSTEM  "all-words.dtd">
+		 * <corpus lang="en">
+		 * ... (plain text, one word/token per line)
+		 * <head id="d02.s81.t07">fellow</head>
+		 * ... (plain text, one word/token per line)
+		 * </corpus>
+		 * 
+		 * SensEval 3 lexical task
+		 * <?xml version="1.0" encoding="UTF-8"?>
+		 * <!DOCTYPE corpus SYSTEM "lexical-sample.dtd">
+		 * <corpus lang="english">
+		 * <lexelt item="appear.v" pos="unk">
+		 * <instance id="appear.v.bnc.00068627" docsrc="BNC">
+		 * <context>
+		 * Feminist criticism ,  like Marxist ,  is avowedly evaluative ,  which sharply distinguishes it from the generality
+		 * of current academic criticism ,  of whatever school .  This is desirable in itself ,  though I do not warm to the
+		 * feminist MacCarthyism which subjects texts to a close ,  hostile interrogation in a search for sexist attitudes .
+		 * I have attempted to take a rapid view of developments in critical theory , or criticism with a theoretical
+		 * consciousness , as they have <head>appeared</head> in British culture in the past twenty years . There is an
+		 * immediate contrast with the literary criticism and theory of the early twentieth century ,  in that most recent
+		 * work begins and ends in the academy ,  and has little contact with current literary practice .  Both the New
+		 * Criticism and Scrutiny  were products of the modernist literary revolution ,  and drew on it for their methods and
+		 * their assumptions .
+		 * </context>
+		 * </instance>
+		 * </lexelt>
+		 * </corpus>
+		 */
+		IInstanceExtractor instExtractor = (IInstanceExtractor) Class.forName(this.m_InstanceExtractorName).newInstance();
 		instExtractor.setCorpus(corpus);
 		instExtractor.setFeatureExtractor(featExtractor);
+
+		// 7. Use the instance extractor to extract <instance> and grouping those with the same <lexelt> together
 		Hashtable<String, ILexelt> lexelts = new Hashtable<String, ILexelt>();
-		while (instExtractor.hasNext()) {
+		while (instExtractor.hasNext()) { // must have corpus and feature extractor set
 			IInstance instance = instExtractor.next();
-			String lexeltID = instance.getLexeltID();
-			id = instance.getID();
+			String lexeltID = instance.getLexeltID(); // E.g. "appear.v"
+			id = instance.getID(); // instance id
 			if (!lexelts.containsKey(lexeltID)) {
+				// Map lexelt id to CLexelt instance, which can contain many CInstance
+				// Representation of a training file
 				lexelts.put(lexeltID, new CLexelt(lexeltID));
 			}
-			if (tags.containsKey(id)) {
-				for (String tag : tags.get(id)) {
-					instance.setTag(tag);
+			if (tags.containsKey(id)) { // tags is a data structure for the key file: { instance id: [sense id] }
+				for (String tag : tags.get(id)) { // for each sense id
+					instance.setTag(tag); // works like add tag because append option is true by default, see CInstance
 				}
 			} else {
 				throw new Exception("cannot find tag for instance " + id);
 			}
 			lexelts.get(lexeltID).addInstance(instance, true);
 		}
+
+		// 8. For each lexelt instance
+		// 		a. Do feature selection (based on cut-off)
+		//		b. Train on the lexelt and get the statistics based on the training file
 		for (String lexeltID : lexelts.keySet()) {
-			//System.err.println(lexeltID);
 			ILexelt lexelt = lexelts.get(lexeltID);
-			System.out.println(lexeltID + " " + lexelt.getInstanceIDs().size());
+			System.out.println(lexeltID + " " + lexelt.getInstanceIDs().size()); // E.g. collaborate.v 57
 			ArrayList<IFeatureSelector> selectors = new ArrayList<IFeatureSelector>();
+
+			// -s2 cut off for surrounding word (default 0)
+			// -c2 cut off for collocation (default 0)
+			// -p2 cut off for pos (default 0)
 			int s2 = 0, c2 = 0, p2 = 0;
 			if (this.m_CutOffs.containsKey("s2")) {
 				s2 = this.m_CutOffs.get("s2");
@@ -232,11 +306,11 @@ public class CTrainModel {
 			if (p2 > 1) {
 				selectors.add(new CPOSFeatureSelector(p2));
 			}
-
+			// Default: No cut-off for sequence vectors
 			selectors.add(new CVectorSequenceFeatureSelector(0));
 
-			IFeatureSelector mixselector = new CFeatureSelectorCombination(selectors);
-			lexelt.getStatistic().select(mixselector);
+			IFeatureSelector masterSelector = new CFeatureSelectorCombination(selectors);
+			lexelt.getStatistic().select(masterSelector);
 			Object model = this.m_Trainer.train(lexelt);
 			System.err.println("done");
 			this.m_Models.add(model);
@@ -377,7 +451,6 @@ public class CTrainModel {
 
 	private void setSkipCol(boolean skipCol) {
 		this.skipCol = skipCol;
-		
 	}
 
 	private void setSkipPOS(boolean skipPOS) {
@@ -398,7 +471,7 @@ public class CTrainModel {
 				+ "\t-i class name of Instance Extractor(default sg.edu.nus.comp.nlp.ims.instance.CInstanceExtractor)\n"
 				+ "\t-f class name of Feature Extractor(default sg.edu.nus.comp.nlp.ims.feature.CMixedFeatureExtractor)\n"
 				+ "\t-c class name of Corpus(default sg.edu.nus.comp.nlp.ims.corpus.CLexicalCorpus)\n"
-				+ "\t-t class name of Trainer(default sg.edu.nus.comp.nlp.ims.classifiers.CLibLinearTrainer)\n"
+				+ "\t-t class name of Trainer(default sg.edu.nus.comp.nlp.ims.classifiers.CGravesLSTMTrainer)\n"
 				+ "\t-m class name of Model Writer(default sg.edu.nus.comp.nlp.ims.io.CModelWriter)\n"
 				+ "\t-algorithm svm(default) or naivebayes\n"
 				+ "\t-s2 cut off for surrounding word(default 0)\n"
@@ -493,7 +566,7 @@ public class CTrainModel {
 			}
 
 			// set trainer
-			String trainerName = CLibLinearTrainer.class.getName();
+			String trainerName = CGravesLSTMTrainer.class.getName();
 			IModelTrainer trainer = null;
 			if (argmgr.has("t")) {
 				trainerName = argmgr.get("t");
@@ -608,7 +681,11 @@ public class CTrainModel {
 				File xmlFile = trainXmlList.get(i);
 				File keyFile = trainKeyList.get(i);
 				System.err.println(xmlFile.getAbsolutePath());
-				trainModel.train(xmlFile.getAbsolutePath(), keyFile.getAbsolutePath(), (embFile!=null)?embFile.getAbsolutePath():"");
+				trainModel.train(
+						xmlFile.getAbsolutePath(),
+						keyFile.getAbsolutePath(),
+						(embFile != null) ? embFile.getAbsolutePath() : ""
+				);
 				trainModel.write();
 				trainModel.clear();
 			}

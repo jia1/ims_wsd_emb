@@ -35,16 +35,35 @@ public class CFeatureExtractorCombination implements IFeatureExtractor {
 	// current feature
 	protected IFeature m_CurrentFeature = null;
 
-	
 	/**
-	 * constructor
+	 * Default constructor
 	 */
 	public CFeatureExtractorCombination() {
 		this.m_FeatureExtractors.add(new CPOSFeatureExtractor());
 		this.m_FeatureExtractors.add(new CCollocationExtractor());
 		this.m_FeatureExtractors.add(new CSurroundingWordExtractor());
 	}
-	
+
+	/**
+	 * Constructor when an ArrayList of feature extractors is provided
+	 *
+	 * @param p_FeatureExtractors
+	 *            feature extractor list
+	 */
+	public CFeatureExtractorCombination(ArrayList<IFeatureExtractor> p_FeatureExtractors) {
+		if (p_FeatureExtractors == null) {
+			throw new IllegalArgumentException("argument cannot be null.");
+		}
+		this.m_FeatureExtractors.addAll(p_FeatureExtractors);
+	}
+
+	/**
+	 * A master feature extractor builder. Exposes public methods to allow the addition of various feature extractors
+	 * to build up this master feature extractor.
+	 *
+	 * Modified and documented by @author Jiayee
+	 *
+	 */
 	public static class Builder {
 		
 		private ArrayList<IFeatureExtractor> features = new ArrayList<IFeatureExtractor>();
@@ -95,21 +114,6 @@ public class CFeatureExtractorCombination implements IFeatureExtractor {
 			return new CFeatureExtractorCombination(features);
 		}
 		
-	}
-	
-
-	/**
-	 * constructor
-	 *
-	 * @param p_FeatureExtractors
-	 *            feature extractor list
-	 */
-	public CFeatureExtractorCombination(
-			ArrayList<IFeatureExtractor> p_FeatureExtractors) {
-		if (p_FeatureExtractors == null) {
-			throw new IllegalArgumentException("argument cannot be null.");
-		}
-		this.m_FeatureExtractors.addAll(p_FeatureExtractors);
 	}
 
 	/**
