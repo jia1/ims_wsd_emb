@@ -33,6 +33,7 @@ import sg.edu.nus.comp.nlp.ims.lexelt.CFeatureSelectorCombination;
 import sg.edu.nus.comp.nlp.ims.lexelt.CLexelt;
 import sg.edu.nus.comp.nlp.ims.lexelt.CPOSFeatureSelector;
 import sg.edu.nus.comp.nlp.ims.lexelt.CSurroundingWordFeatureSelector;
+import sg.edu.nus.comp.nlp.ims.lexelt.CVectorSequenceFeatureSelector;
 import sg.edu.nus.comp.nlp.ims.lexelt.IFeatureSelector;
 import sg.edu.nus.comp.nlp.ims.lexelt.ILexelt;
 import sg.edu.nus.comp.nlp.ims.util.CArgumentManager;
@@ -84,9 +85,9 @@ public class CTrainModel {
 	
 	// embeddings only flag 
 	private boolean onlyEmbed;
-	private boolean skipSur = false;
-	private boolean skipCol = false;
-	private boolean skipPOS = false;
+	private boolean skipSur = true;
+	private boolean skipCol = true;
+	private boolean skipPOS = true;
 	
 	/*** end new features ***/
 	
@@ -231,6 +232,8 @@ public class CTrainModel {
 			if (p2 > 1) {
 				selectors.add(new CPOSFeatureSelector(p2));
 			}
+
+			selectors.add(new CVectorSequenceFeatureSelector(0));
 
 			IFeatureSelector mixselector = new CFeatureSelectorCombination(selectors);
 			lexelt.getStatistic().select(mixselector);
