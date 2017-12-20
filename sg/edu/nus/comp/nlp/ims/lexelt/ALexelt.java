@@ -169,7 +169,7 @@ public abstract class ALexelt implements ILexelt {
 	 */
 	public IInstance removeInstance(String p_InstanceID) {
 		int index = this.m_IDs.indexOf(p_InstanceID);
-		return this.removeInstance(index);
+		return this.removeInstance(index); // Implemented in CLexelt
 	}
 
 }

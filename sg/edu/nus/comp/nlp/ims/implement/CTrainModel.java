@@ -273,7 +273,7 @@ public class CTrainModel {
 			} else {
 				throw new Exception("cannot find tag for instance " + id);
 			}
-			lexelts.get(lexeltID).addInstance(instance, true);
+			lexelts.get(lexeltID).addInstance(instance, true); // true means to add to the current lexelt's statistics
 		}
 
 		// 8. For each lexelt instance

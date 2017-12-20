@@ -47,7 +47,7 @@ public class CStatistic implements IStatistic {
 	// status
 	protected boolean m_Status = false;
 	// size
-	protected int m_Size = 0;
+	protected int m_Size = 0; // Number of instances inside this statistic
 	// feature keys
 	protected ArrayList<String> m_Keys;
 	// key to feature index
@@ -108,44 +108,49 @@ public class CStatistic implements IStatistic {
 	 */
 	public boolean addInstance(IInstance p_Instance) {
 		if (p_Instance != null) {
+			// 1. Add tag mappings to statistic
+			// We need tagIndice because m_tagMap contains all tags across instances but tagIndice is new with each instance
+			// tagIndice allows us to track the universal tag indices in tagMap for this instance
 			ArrayList<Integer> tagIndice = new ArrayList<Integer>();
-			int size = p_Instance.size();
-			for (String tag : p_Instance.getTag()) {
-				if (!this.m_TagMap.containsKey(tag)) {
-					this.m_TagMap.put(tag, this.m_TagMap.size());
-					this.m_Tags.add(tag);
+			for (String tag : p_Instance.getTag()) { // For each tag in this instance
+				if (!this.m_TagMap.containsKey(tag)) { // { sense id: index }
+					this.m_TagMap.put(tag, this.m_TagMap.size()); // Uses size to determine index
+					this.m_Tags.add(tag); // Set (ArrayList) of all tags seen
 					this.m_TagCount.add(0);
 				}
 				int index = this.m_TagMap.get(tag);
 				tagIndice.add(index);
-				this.m_TagCount.set(index, this.m_TagCount.get(index) + 1);
-				this.m_Size++;
+				this.m_TagCount.set(index, this.m_TagCount.get(index) + 1); // Number of instances with that sense id / tag
+				this.m_Size++; // Number of instances inside this statistic
 			}
+
+			// 2. Add feature and feature data type mappings to statistic
+			int size = p_Instance.size(); // Number of features (a feature can be a value, or a list of values, etc.)
 			for (int i = 0; i < size; i++) {
 				String key = (String) p_Instance.getFeatureName(i);
 				IFeature feature = p_Instance.getFeature(i);
 				String value = feature.getValue();
 				if (!this.m_KeyMap.containsKey(key)) {
-					this.m_KeyMap.put(key, this.m_Keys.size());
+					this.m_KeyMap.put(key, this.m_Keys.size()); // Same train of thought as with tags above
 					this.m_Keys.add(key);
 					Class<? extends IFeature> type = feature.getClass();
 					if (this.m_TypeEnum.indexOf(type) < 0) {
 						this.m_TypeEnum.add(type);
 					}
-					int tIdx = this.m_TypeEnum.indexOf(type);
+					int tIdx = this.m_TypeEnum.indexOf(type); // feature data type (e.g. binary, double, list, etc.)
 					this.m_Types.add(tIdx);
 					Hashtable<String, Integer> values = new Hashtable<String, Integer>();
 					ArrayList<Integer> valueCount = new ArrayList<Integer>();
 					ArrayList<ArrayList<Integer>> valueTagCount = new ArrayList<ArrayList<Integer>>();
 
-					this.m_Values.add(values);
-					this.m_ValueCount.add(valueCount);
-					this.m_ValueTagCount.add(valueTagCount);
+					this.m_Values.add(values); // all possible feature value(s) for feature data type
+					this.m_ValueCount.add(valueCount); // number of instances with a particular feature value
+					this.m_ValueTagCount.add(valueTagCount); // feature value count per tag (ArrayList<ArrayList<ArrayList<Integer>>>)
 					if (ANumericFeature.class.isInstance(feature)) {
 						continue;
 					}
 					if (ABinaryFeature.class.isInstance(feature)) {
-						values.put("0", 0);
+						values.put("0", 0); // all possible binary feature values
 						values.put("1", 1);
 						valueCount.add(0);
 						valueCount.add(0);
@@ -159,7 +164,7 @@ public class CStatistic implements IStatistic {
 					}
 				}
 
-				int keyIdx = this.m_KeyMap.get(key);
+				int keyIdx = this.m_KeyMap.get(key); // get index for this particular feature name
 				if (value == null || value.isEmpty()) {
 					value = this.m_Default;
 				}
@@ -171,7 +176,7 @@ public class CStatistic implements IStatistic {
 					valueCount.add(0);
 					valueTagCount.add(new ArrayList<Integer>());
 				}
-				int valueIdx = values.get(value);
+				int valueIdx = values.get(value); // Update statistic with actual feature values (count, type, value)
 				valueCount.set(valueIdx, valueCount.get(valueIdx) + 1);
 				ArrayList<Integer> counts = valueTagCount.get(valueIdx);
 				while (counts.size() < this.m_TagMap.size()) {
