@@ -26,7 +26,7 @@ import sg.edu.nus.comp.nlp.ims.feature.IFeatureExtractor;
 import sg.edu.nus.comp.nlp.ims.instance.CInstanceExtractor;
 import sg.edu.nus.comp.nlp.ims.instance.IInstance;
 import sg.edu.nus.comp.nlp.ims.instance.IInstanceExtractor;
-import sg.edu.nus.comp.nlp.ims.io.CModelWriter;
+import sg.edu.nus.comp.nlp.ims.io.CGravesLSTMModelWriter;
 import sg.edu.nus.comp.nlp.ims.io.IModelWriter;
 import sg.edu.nus.comp.nlp.ims.lexelt.CCollocationFeatureSelector;
 import sg.edu.nus.comp.nlp.ims.lexelt.CFeatureSelectorCombination;
@@ -56,7 +56,7 @@ public class CTrainModel {
 	// model trainer
 	protected IModelTrainer m_Trainer = new CGravesLSTMTrainer();
 	// model writer
-	protected IModelWriter m_Writer = new CModelWriter();
+	protected IModelWriter m_Writer = new CGravesLSTMModelWriter();
 	// corpus class name
 	protected String m_CorpusName = CLexicalCorpus.class.getName();
 	// instance extractor class name
@@ -472,7 +472,7 @@ public class CTrainModel {
 				+ "\t-f class name of Feature Extractor(default sg.edu.nus.comp.nlp.ims.feature.CMixedFeatureExtractor)\n"
 				+ "\t-c class name of Corpus(default sg.edu.nus.comp.nlp.ims.corpus.CLexicalCorpus)\n"
 				+ "\t-t class name of Trainer(default sg.edu.nus.comp.nlp.ims.classifiers.CGravesLSTMTrainer)\n"
-				+ "\t-m class name of Model Writer(default sg.edu.nus.comp.nlp.ims.io.CModelWriter)\n"
+				+ "\t-m class name of Model Writer(default sg.edu.nus.comp.nlp.ims.io.CGravesLSTMModelWriter)\n"
 				+ "\t-algorithm svm(default) or naivebayes\n"
 				+ "\t-s2 cut off for surrounding word(default 0)\n"
 				+ "\t-c2 cut off for collocation(default 0)\n"
@@ -516,7 +516,7 @@ public class CTrainModel {
 			File trainKeyDir = new File(argmgr.get(1));
 
 			// set model writer
-			String writerName = CModelWriter.class.getName();
+			String writerName = CGravesLSTMModelWriter.class.getName();
 			if (argmgr.has("w")) {
 				writerName = argmgr.get("w");
 			}

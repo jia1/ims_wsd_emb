@@ -11,3 +11,5 @@
 /ILexeltWriter.class
 /IModelWriter.class
 /IResultWriter.class
+/CGravesLSTMLexeltWriter.class
+/CGravesLSTMModelWriter.class
