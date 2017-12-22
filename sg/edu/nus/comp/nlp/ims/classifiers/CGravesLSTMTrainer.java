@@ -1,6 +1,5 @@
 package sg.edu.nus.comp.nlp.ims.classifiers;
 
-import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -14,10 +13,6 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-import liblinear.Linear;
-import liblinear.Model;
-import liblinear.Problem;
-import liblinear.SolverType;
 import sg.edu.nus.comp.nlp.ims.io.CLibLinearLexeltWriter;
 import sg.edu.nus.comp.nlp.ims.io.ILexeltWriter;
 import sg.edu.nus.comp.nlp.ims.lexelt.CModelInfo;
@@ -95,18 +90,6 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 			MultiLayerNetwork lstm = new MultiLayerNetwork(conf);
 			lstm.init();
 
-			// Print the number of parameters in the network (and for each layer)
-			/*
-			Layer[] layers = lstm.getLayers();
-			int totalNumParams = 0;
-			for (int i = 0; i < layers.length; i++) {
-				int nParams = layers[i].numParams();
-				System.out.println("Number of parameters in layer " + i + ": " + nParams);
-				totalNumParams += nParams;
-			}
-			System.out.println("Total number of network parameters: " + totalNumParams);
-			*/
-
 			/*
 			WindowOfWordsIterator iterator = getWindowOfWordsIterator(miniBatchSize, windowSize);
 
@@ -116,12 +99,12 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 	                DataSet ds = iterator.next();
 	                lstm.fit(ds);
 	            }
-				iterator.reset();	// Reset iterator for another epoch
+				iterator.reset(); // Reset iterator for another epoch
 			}
 			*/
 
 			// ILexeltWriter lexeltWriter = new CLibLinearLexeltWriter(this.m_Bias);
-			// modelInfo.model = model;
+			modelInfo.model = lstm;
 		}
 
 		return modelInfo;
