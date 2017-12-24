@@ -12,3 +12,5 @@
 /IEvaluator.class
 /IModelTrainer.class
 /CGravesLSTMTrainer.class
+/VectorSequenceIterator.class
+/CGravesLSTMEvaluator.class

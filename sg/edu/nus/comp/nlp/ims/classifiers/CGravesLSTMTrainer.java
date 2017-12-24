@@ -10,10 +10,11 @@ import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-import sg.edu.nus.comp.nlp.ims.io.CLibLinearLexeltWriter;
+import liblinear.FeatureNode;
+import liblinear.Problem;
+import sg.edu.nus.comp.nlp.ims.io.CGravesLSTMLexeltWriter;
 import sg.edu.nus.comp.nlp.ims.io.ILexeltWriter;
 import sg.edu.nus.comp.nlp.ims.lexelt.CModelInfo;
 import sg.edu.nus.comp.nlp.ims.lexelt.ILexelt;
@@ -90,20 +91,18 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 			MultiLayerNetwork lstm = new MultiLayerNetwork(conf);
 			lstm.init();
 
-			/*
-			WindowOfWordsIterator iterator = getWindowOfWordsIterator(miniBatchSize, windowSize);
+			ILexeltWriter lexeltWriter = new CGravesLSTMLexeltWriter();
+			Problem prob = (Problem) lexeltWriter.getInstances(lexelt);
+			FeatureNode[][] featVectors = prob.x;
+			int[] labels = prob.y;
 
-	        int miniBatchNum = 0;
+			// TODO: Convert liblinear.Problem to VectorSequenceIterator here
+
+			VectorSequenceIterator dataSetIterator = null;
+
 			for (int i = 0; i < numEpochs; i++) {
-	            while (iterator.hasNext()) {
-	                DataSet ds = iterator.next();
-	                lstm.fit(ds);
-	            }
-				iterator.reset(); // Reset iterator for another epoch
-			}
-			*/
-
-			// ILexeltWriter lexeltWriter = new CLibLinearLexeltWriter(this.m_Bias);
+                lstm.fit(dataSetIterator);
+            }
 			modelInfo.model = lstm;
 		}
 
