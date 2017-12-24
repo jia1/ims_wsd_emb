@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sg.edu.nus.comp.nlp.ims.classifiers.CLibLinearEvaluator;
+import sg.edu.nus.comp.nlp.ims.classifiers.CGravesLSTMEvaluator;
 import sg.edu.nus.comp.nlp.ims.classifiers.IEvaluator;
 import sg.edu.nus.comp.nlp.ims.corpus.*;
 import sg.edu.nus.comp.nlp.ims.feature.*;
@@ -44,7 +44,7 @@ public class CTester {
 	protected static final String CORPUS = CLexicalCorpus.class.getName();
 
 	// evaluator
-	protected IEvaluator m_Evaluator = new CLibLinearEvaluator();
+	protected IEvaluator m_Evaluator = new CGravesLSTMEvaluator();
 	// writer
 	protected IResultWriter m_Writer = new CResultWriter();
 	// results
@@ -321,7 +321,7 @@ public class CTester {
 					+ "\t-i class name of Instance Extractor(default sg.edu.nus.comp.nlp.ims.instance.CInstanceExtractor)\n"
 					+ "\t-f class name of Feature Extractor(default sg.edu.nus.comp.nlp.ims.feature.CFeatureExtractorCombination)\n"
 					+ "\t-c class name of Corpus(default sg.edu.nus.comp.nlp.ims.corpus.CLexicalCorpus)\n"
-					+ "\t-e class name of Evaluator(default sg.edu.nus.comp.nlp.ims.classifiers.CLibLinearEvaluator)\n"
+					+ "\t-e class name of Evaluator(default sg.edu.nus.comp.nlp.ims.classifiers.CGravesLSTMEvaluator)\n"
 					+ "\t-r class name of Result Writer(default sg.edu.nus.comp.nlp.ims.io.CResultWriter)\n"
 					+ "\t-lexelt path of lexelt file\n"
 					+ "\t-is path of index.sense(option)\n"
@@ -350,7 +350,7 @@ public class CTester {
 			String modelDir = argmgr.get(1);
 			String statDir = argmgr.get(2);
 			String saveDir = argmgr.get(3);
-			String evaluatorName = CLibLinearEvaluator.class.getName();
+			String evaluatorName = CGravesLSTMEvaluator.class.getName();
 			String writerName = CResultWriter.class.getName();
 			String lexeltFile = null;
 			if (argmgr.has("lexelt")) {

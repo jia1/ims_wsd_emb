@@ -16,9 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 import liblinear.FeatureNode;
 import liblinear.Problem;
@@ -154,7 +154,7 @@ public class CGravesLSTMEvaluator extends APreloadEvaluator {
 			break;
 		default:
 			lexelt.setStatistic(stat);
-			Model model = (Model) this.getModel(lexeltID);
+			MultiLayerNetwork model = (MultiLayerNetwork) this.getModel(lexeltID);
 			ILexeltWriter lexeltWriter = new CGravesLSTMLexeltWriter();
 			Problem instances = (Problem) lexeltWriter.getInstances(lexelt);
 			retVal.lexelt = lexelt.getID();
@@ -165,14 +165,16 @@ public class CGravesLSTMEvaluator extends APreloadEvaluator {
 			stat.getTagsInOrder().toArray(retVal.classes);
 			for (int i = 0; i < instances.l; i++) {
 				FeatureNode[] instance = instances.x[i];
-				double[] probs = new double[model.getNrClass()]; // TODO: Fix method to get number of classes / labels
+				int numLabels = model.numLabels();
+				double[] probs = new double[numLabels];
 				retVal.docs[i] = lexelt.getInstanceDocID(i);
 				retVal.ids[i] = lexelt.getInstanceID(i);
 				retVal.probabilities[i] = new double[retVal.classes.length];
 				this.Predict(model, instance, probs);
-				for (int c = 0; c < model.getNrClass(); c++) { // TODO: Ditto
-					if (model.getLabels()[c] > 0) { // TODO: Fix method to get the classes / labels
-						retVal.probabilities[i][model.getLabels()[c] - 1] = probs[c]; // TODO: Ditto
+				for (int c = 0; c < numLabels; c++) {
+					int value = model.getLabels().getInt(c); // TODO: Verify if getInt() is the correct method to call
+					if (value > 0) {
+						retVal.probabilities[i][value - 1] = probs[c];
 					}
 				}
 			}
@@ -187,16 +189,16 @@ public class CGravesLSTMEvaluator extends APreloadEvaluator {
 	 * @param prob_estimates output probabilities
 	 * @return answer
 	 */
-	protected int Predict(Model model, FeatureNode[] x, double[] prob_estimates) {
-		int nr_class = model.getNrClass(); // TODO: Ditto
+	protected int Predict(MultiLayerNetwork model, FeatureNode[] x, double[] prob_estimates) {
+		int nr_class = model.numLabels();
 		int nr_w;
 		if (nr_class == 2) {
 			nr_w = 1;
 		} else {
 			nr_w = nr_class;
 		}
-		// TODO: Convert FeatureNode[] to suitable data type for GravesLSTM
-		int label = Linear.predictValues(model, x, prob_estimates); // TODO: Replace this with GravesLSTM evaluate
+		// TODO: Convert FeatureNode[] to suitable data type for GravesLSTM. Find out what is prob_estimates supposed to do
+		int label = Linear.predictValues(model, x, prob_estimates); // TODO: Replace this with GravesLSTM predict method
 		for (int i = 0; i < nr_w; i++) {
 			prob_estimates[i] = 1 / (1 + Math.exp(-prob_estimates[i]));
 		}
@@ -220,25 +222,11 @@ public class CGravesLSTMEvaluator extends APreloadEvaluator {
 	 */
 	@Override
 	protected Object loadModelFromDisk(String p_LexeltID) throws Exception {
-		Object model = null;
 		File modelFile = new File(this.m_ModelDir + this.m_FileSeparator + p_LexeltID + ".model.gz");
 		if (!modelFile.exists()) {
 			modelFile = new File(this.m_ModelDir + this.m_FileSeparator + p_LexeltID + ".model");
 		}
-		if (!modelFile.exists()) {
-			Matcher matcher = LEXELTPATTERN.matcher(p_LexeltID);
-			if (matcher.matches()) {
-				model = this.getModel(matcher.group(1));
-			}
-		} else {
-			InputStream is = new FileInputStream(modelFile);
-			if (modelFile.getName().endsWith(".gz")) {
-				is = new GZIPInputStream(is);
-			}
-			ObjectInputStream ois = new ObjectInputStream(is);
-			model = ois.readObject();
-			ois.close();
-		}
+		MultiLayerNetwork model = ModelSerializer.restoreMultiLayerNetwork(modelFile);
 		return model;
 	}
 
