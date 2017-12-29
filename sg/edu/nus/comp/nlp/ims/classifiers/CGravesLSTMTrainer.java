@@ -96,10 +96,7 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 			FeatureNode[][] featVectors = prob.x;
 			int[] labels = prob.y;
 
-			// TODO: Convert liblinear.Problem to VectorSequenceIterator here
-
-			VectorSequenceIterator dataSetIterator = null;
-
+			VectorSequenceIterator dataSetIterator = new VectorSequenceIterator(featVectors, labels, miniBatchSize);
 			for (int i = 0; i < numEpochs; i++) {
                 lstm.fit(dataSetIterator);
             }
