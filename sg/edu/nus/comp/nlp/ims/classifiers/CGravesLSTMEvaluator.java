@@ -19,6 +19,7 @@ import java.util.zip.GZIPInputStream;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import liblinear.FeatureNode;
 import liblinear.Problem;
@@ -197,8 +198,14 @@ public class CGravesLSTMEvaluator extends APreloadEvaluator {
 		} else {
 			nr_w = nr_class;
 		}
-		// TODO: Convert FeatureNode[] to suitable data type for GravesLSTM. Find out what is prob_estimates supposed to do
-		int label = Linear.predictValues(model, x, prob_estimates); // TODO: Replace this with GravesLSTM predict method
+		// TODO: Find out what is prob_estimates supposed to do
+		double[] featVector = new double[x.length];
+		for (int i = 0; i < x.length; i++) {
+			featVector[i] = x[i].value;
+		}
+
+		int[] labels = model.predict(Nd4j.create(featVector));
+		int label = labels[0];
 		for (int i = 0; i < nr_w; i++) {
 			prob_estimates[i] = 1 / (1 + Math.exp(-prob_estimates[i]));
 		}
