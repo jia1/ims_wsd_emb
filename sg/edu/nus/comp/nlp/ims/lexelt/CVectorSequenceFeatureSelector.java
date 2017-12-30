@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.nlp.ims.lexelt;
 
-import sg.edu.nus.comp.nlp.ims.feature.CVectorSequenceFeature;
+import sg.edu.nus.comp.nlp.ims.feature.CVectorSequence;
 
 /**
  * 
@@ -10,6 +10,6 @@ import sg.edu.nus.comp.nlp.ims.feature.CVectorSequenceFeature;
 public class CVectorSequenceFeatureSelector extends AListFeatureSelector {
 	public CVectorSequenceFeatureSelector(int p_M2) {
 		this.m_M2 = p_M2;
-		this.m_FeatureName = CVectorSequenceFeature.class.getName();
+		this.m_FeatureName = CVectorSequence.class.getName();
 	}
 }

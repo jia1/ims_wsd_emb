@@ -10,13 +10,12 @@
  */
 package pkg.feature.emb;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import pkg.feature.CEmbeddingsDimensionExtractor;
 import sg.edu.nus.comp.nlp.ims.corpus.IItem;
 import sg.edu.nus.comp.nlp.ims.feature.CDoubleFeature;
-import sg.edu.nus.comp.nlp.ims.feature.CVectorSequenceFeature;
+import sg.edu.nus.comp.nlp.ims.feature.CVectorSequence;
 import sg.edu.nus.comp.nlp.ims.feature.IFeature;
 
 public abstract class IntegrationStrategy {
@@ -213,7 +212,7 @@ public abstract class IntegrationStrategy {
 			public IFeature getNext(CEmbeddingsDimensionExtractor extractor) {
 				IFeature feature = null;
 				if (extractor.getM_EmbeddingDimensionIndex() >= 0 && extractor.getM_EmbeddingDimensionIndex() < extractor.getVectorSize()) {
-					feature = new CVectorSequenceFeature();
+					feature = new CVectorSequence();
 					feature.setKey(this.formEmbeddingDimensionName(extractor.getM_EmbeddingDimensionIndex()));
 					feature.setValue(Arrays.toString(getEmbeddingDimension(extractor, extractor.getM_EmbeddingDimensionIndex())));
 					extractor.setM_EmbeddingDimensionIndex(extractor.getM_EmbeddingDimensionIndex() + 1);

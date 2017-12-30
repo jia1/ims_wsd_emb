@@ -14,3 +14,5 @@
 /IFeature.class
 /IFeatureExtractor.class
 /CVectorSequenceFeature.class
+/CVectorSequence.class
+/CVectorSequenceExtractor.class
