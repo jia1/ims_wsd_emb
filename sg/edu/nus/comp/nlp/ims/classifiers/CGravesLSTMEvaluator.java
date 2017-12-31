@@ -173,7 +173,7 @@ public class CGravesLSTMEvaluator extends APreloadEvaluator {
 				retVal.probabilities[i] = new double[retVal.classes.length];
 				this.Predict(model, instance, probs);
 				for (int c = 0; c < numLabels; c++) {
-					int value = model.getLabels().getInt(c); // TODO: Verify if getInt() is the correct method to call
+					int value = model.getLabels().getInt(c);
 					if (value > 0) {
 						retVal.probabilities[i][value - 1] = probs[c];
 					}

@@ -26,19 +26,21 @@ public class VectorSequenceIterator implements DataSetIterator {
 	private INDArray dataSetLabels;
 	private int index; // for tracking hasNext and next
 
-	public VectorSequenceIterator(FeatureNode[][] featVectors, int[] labels, int miniBatchSize) {
+	public VectorSequenceIterator(ArrayList<FeatureNode[][]> featVectors, int[] labels, int miniBatchSize) {
 		this.miniBatchSize = miniBatchSize;
 		this.arrayOfLabels = labels;
 		this.dataSetLabels = Nd4j.create(labels);
 
-		double[][] values = new double[featVectors.length][];
-		for (int i = 0; i < featVectors.length; i++) {
-			values[i] = new double[featVectors[i].length];
-			for (int j = 0; j < featVectors[i].length; j++) {
-				values[i][j] = featVectors[i][j].value;
+		double[][][] values = new double[featVectors.size()][][]; // number of examples, number of time steps, word vectors
+		for (int i = 0; i < featVectors.size(); i++) {
+			values[i] = new double[featVectors.get(i).length][];
+			for (int j = 0; j < featVectors.get(i).length; j++) {
+			    for (int k = 0; k < featVectors.get(i)[j].length; k++) {
+			        values[i][j][k] = featVectors.get(i)[j][k].value;
+			    }
 			}
 		}
-		this.dataSetValues = Nd4j.create(values);
+		// this.dataSetValues = Nd4j.create(values); // TODO: Fix this
 		this.index = 0;
 	}
 

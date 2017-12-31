@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.nlp.ims.classifiers;
 
+import java.util.ArrayList;
+
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -92,8 +94,9 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 			lstm.init();
 
 			ILexeltWriter lexeltWriter = new CGravesLSTMLexeltWriter();
-			Problem prob = (Problem) lexeltWriter.getInstances(lexelt);
-			FeatureNode[][] featVectors = prob.x;
+			Object[] instances = (Object[]) lexeltWriter.getInstances(lexelt); // { retVal, featureVectors }
+			Problem prob = (Problem) instances[0];
+			ArrayList<FeatureNode[][]> featVectors = (ArrayList<FeatureNode[][]>) instances[1];
 			int[] labels = prob.y;
 
 			VectorSequenceIterator dataSetIterator = new VectorSequenceIterator(featVectors, labels, miniBatchSize);

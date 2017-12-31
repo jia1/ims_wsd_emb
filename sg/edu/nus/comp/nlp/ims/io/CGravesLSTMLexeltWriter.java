@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
 import liblinear.FeatureNode;
 import liblinear.Problem;
 import sg.edu.nus.comp.nlp.ims.feature.IFeature;
@@ -65,12 +68,14 @@ public class CGravesLSTMLexeltWriter implements ILexeltWriter {
 	 */
 	protected String toString(IInstance p_Instance, IStatistic p_Stat, int[][] p_Indice){
 		StringBuilder featureBuilder = new StringBuilder();
-		FeatureNode[] features = this.getVector(p_Instance, p_Stat, p_Indice);
+		FeatureNode[][] features = this.getVector(p_Instance, p_Stat, p_Indice);
 		for (int i = 0; i < features.length; i++) {
-			featureBuilder.append(" ");
-			featureBuilder.append(features[i].index);
-			featureBuilder.append(":");
-			featureBuilder.append(features[i].value);
+		    for (int j = 0; j < features[i].length; j++) {
+		        featureBuilder.append(" ");
+		        featureBuilder.append(features[i][j].index);
+		        featureBuilder.append(":");
+		        featureBuilder.append(features[i][j].value);
+		    }
 		}
 		String featureOnly = featureBuilder.toString();
 		StringBuilder featureVector = new StringBuilder();
@@ -88,11 +93,12 @@ public class CGravesLSTMLexeltWriter implements ILexeltWriter {
 	 * @param p_Stat statistic
 	 * @return feature vector
 	 */
-	protected FeatureNode[] getVector(IInstance p_Instance, IStatistic p_Stat, int[][] p_Indice){
+	protected FeatureNode[][] getVector(IInstance p_Instance, IStatistic p_Stat, int[][] p_Indice){
 		String value = null;
+		INDArray finVal = null;
 		int kIndex = 0;
 		int featureSize = p_Instance.size();
-		Hashtable <Integer, Double> exist = new Hashtable <Integer, Double>();
+		Hashtable<Integer, Double> exist = new Hashtable<>();
 		for(int fIndex = 0;fIndex < featureSize;fIndex++) {
 			IFeature feature = p_Instance.getFeature(fIndex);
 			kIndex = p_Stat.getIndex(feature.getKey());
@@ -102,7 +108,10 @@ public class CGravesLSTMLexeltWriter implements ILexeltWriter {
 			List<String> values = p_Stat.getValue(kIndex);
 			value = feature.getValue();
 			if (value == null || !p_Stat.contains(kIndex, value)) {
-				value = p_Stat.getDefaultValue();
+				// value = p_Stat.getDefaultValue(); // Override
+			    finVal = Nd4j.zeros(1, 1);
+			} else {
+			    finVal = Nd4j.create(fromString(value));
 			}
 			for (int i = 0;i < values.size();i++) {
 				if (values.get(i).equals(value)) {
@@ -113,12 +122,25 @@ public class CGravesLSTMLexeltWriter implements ILexeltWriter {
 		}
 		ArrayList<Integer> indice = new ArrayList<Integer>(exist.keySet());
 		Collections.sort(indice);
-		FeatureNode[] retVal = new FeatureNode[exist.size()];
-		for (int i = 0;i < indice.size();i++) {
-			retVal[i] = new FeatureNode(indice.get(i), exist.get(indice.get(i)));
+		FeatureNode[][] retVal = new FeatureNode[exist.size()][];
+		for (int i = 0; i < indice.size(); i++) {
+		    for (int j = 0; j < finVal.shape()[0]; j++) {
+		        double val = finVal.getDouble(j);
+		        retVal[i][j] = new FeatureNode((int) (Math.pow(2, i) * Math.pow(3, j)), val);
+		    }
 		}
 		return retVal;
 	}
+
+	// TODO: Move to util
+	private static double[] fromString(String string) {
+	    String[] strings = string.replace("[", "").replace("]", "").split(", ");
+	    double result[] = new double[strings.length];
+	    for (int i = 0; i < result.length; i++) {
+	        result[i] = Double.parseDouble(strings[i]);
+        }
+	    return result;
+    }
 
 	/**
 	 * change tags to integer (start from 1)
@@ -182,7 +204,7 @@ public class CGravesLSTMLexeltWriter implements ILexeltWriter {
 	@Override
 	public Object getInstances(ILexelt p_Lexelt) throws Exception {
 		Problem retVal = new Problem();
-		ArrayList<FeatureNode[]> featureVectors = new ArrayList<FeatureNode[]>();
+		ArrayList<FeatureNode[][]> featureVectors = new ArrayList<>();
 		ArrayList<Integer> classes = new ArrayList<Integer>();
 		int[][] indice = this.loadStatistic(p_Lexelt);
 		if (indice == null) {
@@ -192,8 +214,8 @@ public class CGravesLSTMLexeltWriter implements ILexeltWriter {
 		int size = p_Lexelt.size(); // instance count
 		for (int i = 0;i < size;i++) {
 			IInstance instance = p_Lexelt.getInstance(i);
-			FeatureNode[] featureVector = this.getVector(instance, stat, indice);
-			for (Integer tag:this.processTags(stat, instance.getTag())) {
+			FeatureNode[][] featureVector = this.getVector(instance, stat, indice);
+			for (Integer tag: this.processTags(stat, instance.getTag())) {
 				featureVectors.add(Arrays.copyOf(featureVector, featureVector.length));
 				classes.add(tag);
 			}
@@ -202,10 +224,9 @@ public class CGravesLSTMLexeltWriter implements ILexeltWriter {
 		retVal.x = new FeatureNode[retVal.l][];
 		retVal.y = new int[retVal.l];
 		for (int i = 0; i < retVal.l; i++) {
-			retVal.x[i] = featureVectors.get(i);
 			retVal.y[i] = classes.get(i);
 		}
-		return retVal;
+		return new Object[]{ retVal, featureVectors }; // Incomplete Problem and ArrayList<FeatureNode[][]>
 	}
 
 }
