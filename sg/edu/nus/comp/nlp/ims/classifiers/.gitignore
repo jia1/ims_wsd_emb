@@ -14,3 +14,6 @@
 /CGravesLSTMTrainer.class
 /VectorSequenceIterator.class
 /CGravesLSTMEvaluator.class
+/VectorSequenceRecordReade.class
+/VectorSequenceRecordReader.class
+/VectorSequenceInputSplit.class

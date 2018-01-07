@@ -22,31 +22,31 @@ public class VectorSequenceIterator implements DataSetIterator {
 	// Size of each mini batch (number of windows of words)
 	private int miniBatchSize;
 	private int[] arrayOfLabels;
-	private INDArray dataSetValues;
+	private double[][][] dataSetValues;
 	private INDArray dataSetLabels;
 	private int index; // for tracking hasNext and next
 
 	public VectorSequenceIterator(ArrayList<FeatureNode[][]> featVectors, int[] labels, int miniBatchSize) {
 		this.miniBatchSize = miniBatchSize;
-		this.arrayOfLabels = labels;
-		this.dataSetLabels = Nd4j.create(labels);
 
-		double[][][] values = new double[featVectors.size()][][]; // number of examples, number of time steps, word vectors
+		arrayOfLabels = labels;
+		dataSetLabels = Nd4j.create(labels, 'c');
+
+		dataSetValues = new double[featVectors.size()][][]; // number of examples, number of time steps, word vectors
 		for (int i = 0; i < featVectors.size(); i++) {
-			values[i] = new double[featVectors.get(i).length][];
+		    dataSetValues[i] = new double[featVectors.get(i).length][];
 			for (int j = 0; j < featVectors.get(i).length; j++) {
 			    for (int k = 0; k < featVectors.get(i)[j].length; k++) {
-			        values[i][j][k] = featVectors.get(i)[j][k].value;
+			        dataSetValues[i][j][k] = featVectors.get(i)[j][k].value;
 			    }
 			}
 		}
-		// this.dataSetValues = Nd4j.create(values); // TODO: Fix this
 		this.index = 0;
 	}
 
 	@Override
 	public boolean hasNext() {
-		return index < dataSetValues.length();
+		return index < dataSetValues.length;
 	}
 
 	@Override
@@ -93,17 +93,20 @@ public class VectorSequenceIterator implements DataSetIterator {
 
 	@Override
 	public DataSet next(int size) {
-		int n = Math.min(size, dataSetValues.length() - index);
+		int n = Math.min(size, dataSetValues.length - index);
 		// INDArray slice(int i, int dimension)
 		// Returns the specified slice of this ndarray
-		DataSet dataSet = new DataSet(dataSetValues.slice(index, n), dataSetLabels.slice(index, n));
+		for (int i = index; i < index + n; i++) {
+		    // TODO: Implement this and remember to set dataSet to non-null DataSet
+		}
+		DataSet dataSet = null;
 		index = index + n;
 		return dataSet;
 	}
 
 	@Override
 	public int numExamples() {
-		return dataSetValues.length();
+		return dataSetValues.length;
 	}
 
 	@Override

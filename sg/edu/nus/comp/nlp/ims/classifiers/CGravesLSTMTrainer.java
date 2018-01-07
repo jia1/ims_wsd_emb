@@ -2,6 +2,11 @@ package sg.edu.nus.comp.nlp.ims.classifiers;
 
 import java.util.ArrayList;
 
+import org.datavec.api.records.reader.SequenceRecordReader;
+import org.datavec.api.records.reader.impl.csv.CSVSequenceRecordReader;
+import org.datavec.api.split.NumberedFileInputSplit;
+import org.deeplearning4j.datasets.datavec.SequenceRecordReaderDataSetIterator;
+import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -99,7 +104,45 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 			ArrayList<FeatureNode[][]> featVectors = (ArrayList<FeatureNode[][]>) instances[1];
 			int[] labels = prob.y;
 
-			VectorSequenceIterator dataSetIterator = new VectorSequenceIterator(featVectors, labels, miniBatchSize);
+			// Transform 2D featVectors to 3D: Number of examples, number of time steps, word vectors
+			for (int i = 0; i < featVectors.size(); i++) {
+			    // TODO
+			}
+
+			for (int i = 0; i < featVectors.size(); i++) {
+			    for (int j = 0; j < featVectors.get(i).length; j++) {
+			        for (int k = 0; k < featVectors.get(i)[j].length; k++) {
+			            FeatureNode vectorNode = featVectors.get(i)[j][k];
+			            int vectorIndex = vectorNode.index;
+			            double value = vectorNode.value;
+			            int[] vectorIndices = getExponents(vectorIndex);
+			            int a = vectorIndices[0]; // which example
+			            int b = vectorIndices[1]; // which feature in the example (in a flattened array)
+			            // TODO
+			        }
+			    }
+			}
+
+			int numPossibleLabels = 0;
+			for (int i = 0; i < labels.length; i++) {
+			    numPossibleLabels = Math.max(labels[i], numPossibleLabels);
+			}
+
+			SequenceRecordReader featureReader = new CSVSequenceRecordReader(0, ",");
+			SequenceRecordReader labelReader = new CSVSequenceRecordReader(0, ",");
+			featureReader.initialize(new NumberedFileInputSplit("values%d.csv", 0, 9));
+			labelReader.initialize(new NumberedFileInputSplit("labels%d.csv", 0, 9));
+
+			// For classification problems: numPossibleLabels is the number of classes in your data set. Use regression = false.
+			DataSetIterator dataSetIterator = (DataSetIterator) new SequenceRecordReaderDataSetIterator(
+			        featureReader,
+			        labelReader,
+			        miniBatchSize,
+			        numPossibleLabels,
+			        false, // regression parameter
+			        SequenceRecordReaderDataSetIterator.AlignmentMode.ALIGN_END);
+
+			// VectorSequenceIterator dataSetIterator = new VectorSequenceIterator(featVectors, labels, miniBatchSize);
 			for (int i = 0; i < numEpochs; i++) {
                 lstm.fit(dataSetIterator);
             }
@@ -107,6 +150,17 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 		}
 
 		return modelInfo;
+	}
+
+	private int[] getExponents(int x) {
+	    int[] exponents = new int[2];
+	    while (x % 2 == 0) {
+	        exponents[0] += 1;
+	    }
+	    while (x % 3 == 0) {
+            exponents[1] += 1;
+        }
+	    return exponents;
 	}
 
 }
