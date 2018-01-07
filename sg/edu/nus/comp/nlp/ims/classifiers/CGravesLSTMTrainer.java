@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.nlp.ims.classifiers;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 import org.datavec.api.records.reader.SequenceRecordReader;
@@ -126,12 +128,15 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 			int numPossibleLabels = 0;
 			for (int i = 0; i < labels.length; i++) {
 			    numPossibleLabels = Math.max(labels[i], numPossibleLabels);
+			    BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("labels%d.csv", i)));
+			    writer.write(labels[i]);
+			    writer.close();
 			}
 
 			SequenceRecordReader featureReader = new CSVSequenceRecordReader(0, ",");
 			SequenceRecordReader labelReader = new CSVSequenceRecordReader(0, ",");
-			featureReader.initialize(new NumberedFileInputSplit("values%d.csv", 0, 9));
-			labelReader.initialize(new NumberedFileInputSplit("labels%d.csv", 0, 9));
+			featureReader.initialize(new NumberedFileInputSplit("values%d.csv", 0, 9)); // TODO: Update 9
+			labelReader.initialize(new NumberedFileInputSplit("labels%d.csv", 0, labels.length - 1));
 
 			// For classification problems: numPossibleLabels is the number of classes in your data set. Use regression = false.
 			DataSetIterator dataSetIterator = (DataSetIterator) new SequenceRecordReaderDataSetIterator(
