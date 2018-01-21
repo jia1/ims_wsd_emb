@@ -108,18 +108,14 @@ public class CGravesLSTMTrainer implements IModelTrainer {
 
 			// Transform 2D featVectors to 3D: Number of examples, number of time steps, word vectors
 			for (int i = 0; i < featVectors.size(); i++) {
-			    // TODO
-			}
-
-			for (int i = 0; i < featVectors.size(); i++) {
 			    for (int j = 0; j < featVectors.get(i).length; j++) {
 			        for (int k = 0; k < featVectors.get(i)[j].length; k++) {
 			            FeatureNode vectorNode = featVectors.get(i)[j][k];
 			            int vectorIndex = vectorNode.index;
 			            double value = vectorNode.value;
 			            int[] vectorIndices = getExponents(vectorIndex);
-			            int a = vectorIndices[0]; // which example
-			            int b = vectorIndices[1]; // which feature in the example (in a flattened array)
+			            int a = vectorIndices[0]; // which example, should == j
+			            int b = vectorIndices[1]; // which feature in the example (in a flattened array), should == k
 			            // TODO
 			        }
 			    }
