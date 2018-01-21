@@ -8,6 +8,8 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.INDArrayIndex;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 
 import liblinear.FeatureNode;
 
@@ -22,14 +24,21 @@ public class VectorSequenceIterator implements DataSetIterator {
 	// Size of each mini batch (number of windows of words)
 	private int miniBatchSize;
 	private int[] arrayOfLabels;
-	private INDArray dataSetValues;
+	private INDArray[] dataSetValues;
 	private INDArray dataSetLabels;
 	private int index; // for tracking hasNext and next
 
-	public VectorSequenceIterator(ArrayList<FeatureNode[][]> featVectors, int[] labels, int miniBatchSize) {
+	private int windowSize;
+	private int wordVectorSize;
+
+	public VectorSequenceIterator(ArrayList<FeatureNode[][]> featVectors, int[] labelArray, int miniBatchSize) {
 		this.miniBatchSize = miniBatchSize;
-		this.arrayOfLabels = labels;
-		this.dataSetLabels = Nd4j.create(labels);
+		this.arrayOfLabels = labelArray;
+		this.dataSetValues = new INDArray[featVectors.size()];
+		this.dataSetLabels = Nd4j.create(labelArray.length, 'f');
+
+		this.windowSize = 5; // TODO: Abstract this
+		this.wordVectorSize = featVectors.get(0)[0].length;
 
 		double[][][] values = new double[featVectors.size()][][]; // number of examples, number of time steps, word vectors
 		for (int i = 0; i < featVectors.size(); i++) {
@@ -40,13 +49,17 @@ public class VectorSequenceIterator implements DataSetIterator {
 			    }
 			}
 		}
-		// this.dataSetValues = Nd4j.create(values); // TODO: Fix this
+
+        for (int i = 0; i < values.length; i++) {
+            dataSetValues[i] = Nd4j.create(values[i]).transpose();
+        }
+        
 		this.index = 0;
 	}
 
 	@Override
 	public boolean hasNext() {
-		return index < dataSetValues.length();
+		return index < dataSetValues.length;
 	}
 
 	@Override
@@ -93,17 +106,32 @@ public class VectorSequenceIterator implements DataSetIterator {
 
 	@Override
 	public DataSet next(int size) {
-		int n = Math.min(size, dataSetValues.length() - index);
+		int n = Math.min(size, dataSetValues.length - index);
 		// INDArray slice(int i, int dimension)
 		// Returns the specified slice of this ndarray
-		DataSet dataSet = new DataSet(dataSetValues.slice(index, n), dataSetLabels.slice(index, n));
+
+		INDArray features = Nd4j.create(new int[]{n, dataSetValues[0].getColumn(0).length(),  windowSize}, 'f');
+
+		for (int i = index; i < index + n; i++) {
+            // Put word vectors into features array at the following indices:
+            // 1) Document (i)
+            // 2) All vector elements which is equal to NDArrayIndex.interval(0, vectorSize)
+            // 3) All elements between 0 and the length of the current sequence
+            features.put(
+                new INDArrayIndex[] {
+                    NDArrayIndex.point(i), NDArrayIndex.all(), NDArrayIndex.interval(0, windowSize)
+                },
+                dataSetValues[i]);
+		}
+		
+		DataSet dataSet = new DataSet(features, dataSetLabels.slice(index, n));
 		index = index + n;
 		return dataSet;
 	}
 
 	@Override
 	public int numExamples() {
-		return dataSetValues.length();
+		return dataSetValues.length;
 	}
 
 	@Override
